@@ -20,6 +20,10 @@ import { AILoadingScreen } from './AILoadingScreen'
 import { useNavigate } from 'react-router'
 import { CreateAiBoardModal } from './CreateAiBoardModal'
 
+// The AI board button needs a paid OpenAI key on the server. It shows only when
+// the frontend is built with VITE_ENABLE_AI=true.
+const isAiEnabled = import.meta.env.VITE_ENABLE_AI === 'true'
+
 export function BoardDetailsHeader({ isRightNavBarOpen, setIsRightNavBarOpen, setIsFilterOpen, isFilterOpen, displayStyle, setDisplayStyle }) {
   const board = useSelector(storeState => storeState.boardModule.board)
   const user = useSelector(storeState => storeState.userModule.user)
@@ -255,7 +259,7 @@ export function BoardDetailsHeader({ isRightNavBarOpen, setIsRightNavBarOpen, se
             <span className='board-icon-text'>table</span>
           </div>
 
-          <div onClick={() => setIsModalOpen(true)}
+          {isAiEnabled && <div onClick={() => setIsModalOpen(true)}
             onMouseEnter={() => setBtnHoverState({ isHover: true, btn: 'chat' })}
             onMouseLeave={() => setBtnHoverState({ isHover: false, btn: 'chat' })}
             className='chat-trellife-container'
@@ -270,7 +274,7 @@ export function BoardDetailsHeader({ isRightNavBarOpen, setIsRightNavBarOpen, se
               className='chat-trellife-text'
               style={{ color: outsideTextColor }}
             >Create AI Board</span>
-          </div>
+          </div>}
 
         </div>
 
