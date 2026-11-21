@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 
 import { HomePage } from './pages/HomePage'
@@ -13,7 +14,16 @@ import { loadBoards } from './store/actions/board.actions.js'
 import { Auth } from './pages/Auth.jsx'
 
 export function RootCmp() {
-	loadBoards()
+	const user = useSelector(storeState => storeState.userModule.user)
+	const userId = user ? user._id : null
+
+	// The board API needs a login. Load boards only once someone is logged
+	// in (the header logs visitors in as Guest), never before.
+	useEffect(() => {
+		if (!userId) return
+		loadBoards()
+	}, [userId])
+
 	return (
 		<div className="main-container">
 			<UserMsg />

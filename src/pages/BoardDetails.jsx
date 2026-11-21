@@ -58,9 +58,13 @@ export function BoardDetails() {
     }
   }, [board])
 
+  const userId = user ? user._id : null
+
+  // The board API needs a login; wait for the Guest login on a direct link.
   useEffect(() => {
+    if (!userId) return
     loadBoard(boardId)
-  }, [boardId])
+  }, [boardId, userId])
 
   useEffect(() => {
     if (board) {
