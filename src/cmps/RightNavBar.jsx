@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { removeBoard } from '../store/actions/board.actions'
 import { removeBoardFromFavorites } from '../store/actions/user.actions'
+import { escapeHtml } from '../services/escape-html.js'
 import { useNavigate } from "react-router"
 import { ChangeColorBackground } from './ChangeColorBackground'
 import { ChangePhotoBackground } from "./ChangePhotoBackground"
@@ -69,8 +70,12 @@ export function RightNavBar({ onClose, isRightNavBarOpen, toggleAllGroupsCollaps
         await toggleAllGroupsCollapse(newState)
     }
 
+    // Builds the activity line as an HTML string for dangerouslySetInnerHTML.
+    // Every piece that comes from stored data is escaped first, so a title
+    // like <img onerror=...> shows as text instead of running.
     function getActivityByTitle(activity, board, users) {
         const shortTitle = activity.title.split(' ').slice(0, 2).join(' ')
+        const safeTitle = escapeHtml(activity.title)
 
 
         function replaceUserIds(title) {
@@ -79,7 +84,7 @@ export function RightNavBar({ onClose, isRightNavBarOpen, toggleAllGroupsCollaps
             }
             return users.reduce((acc, user) => {
                 if (user && user._id && acc.includes(user._id)) {
-                    return acc.replace(user._id, `<span class="user-mention">${user.fullname}</span>`)
+                    return acc.replace(user._id, `<span class="user-mention">${escapeHtml(user.fullname)}</span>`)
                 }
                 return acc
             }, title)
@@ -120,17 +125,17 @@ export function RightNavBar({ onClose, isRightNavBarOpen, toggleAllGroupsCollaps
         if (shortTitle === 'create board') {
             formattedTitle = 'created this board'
         } else if (activity.task && board && activity.title.includes(activity.task.id)) {
-            const href = `${board._id}/${activity.group.id}/${activity.task.id}`
-            const linkText = `<a href="${href}">${activity.task.title}</a>`
-            formattedTitle = activity.title.replace(activity.task.id, linkText)
+            const href = `${escapeHtml(board._id)}/${escapeHtml(activity.group.id)}/${escapeHtml(activity.task.id)}`
+            const linkText = `<a href="${href}">${escapeHtml(activity.task.title)}</a>`
+            formattedTitle = safeTitle.replace(escapeHtml(activity.task.id), linkText)
         } else if (board && shortTitle === 'add comment' && activity.task) {
-            const href = `${board._id}/${activity.group.id}/${activity.task.id}`
-            const linkText = `<a href="${href}">${activity.task.title}</a>`
-            const newTitle = `added a comment to ${activity.task.id}`
-            formattedTitle = newTitle.replace(activity.task.id, linkText)
+            const href = `${escapeHtml(board._id)}/${escapeHtml(activity.group.id)}/${escapeHtml(activity.task.id)}`
+            const linkText = `<a href="${href}">${escapeHtml(activity.task.title)}</a>`
+            const newTitle = `added a comment to ${escapeHtml(activity.task.id)}`
+            formattedTitle = newTitle.replace(escapeHtml(activity.task.id), linkText)
         } else {
-            // For all other cases, keep the original title
-            formattedTitle = activity.title
+            // For all other cases, keep the original title (escaped)
+            formattedTitle = safeTitle
         }
 
 
