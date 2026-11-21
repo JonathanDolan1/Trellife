@@ -35,7 +35,7 @@ export async function login(credentials) {
         socketService.login(user._id)
         return user
     } catch (err) {
-        console.log('Cannot login', err)
+        console.log('Cannot login, status:', err?.response?.status)
         throw err
     }
 }
@@ -59,7 +59,7 @@ export async function signup(credentials) {
         socketService.login(user._id)
         return user
     } catch (err) {
-        console.log('Cannot signup', err)
+        console.log('Cannot signup, status:', err?.response?.status)
         throw err
     }
 }

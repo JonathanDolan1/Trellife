@@ -41,7 +41,8 @@ export function Auth() {
                 console.error('User info is not valid')
             }
         } catch (err) {
-            console.error(err)
+            // Only the status: the raw error includes the submitted password.
+            console.error('Auth request failed, status:', err?.response?.status)
             throw err
         }
     }
